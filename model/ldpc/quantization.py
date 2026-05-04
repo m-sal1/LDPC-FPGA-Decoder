@@ -1,6 +1,6 @@
 import numpy as np
 
-def quantize_llr(llr, bits=6, scale=4):
+def quantize_llr(llr, bits=8, scale=2):
     max_val = 2 ** (bits - 1) - 1
     min_val = -max_val
 
