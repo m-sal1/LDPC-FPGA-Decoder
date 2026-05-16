@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# WSL virtual environment
+.venv_wsl/
+
+# Quartus generated files
+db/
+incremental_db/
+output_files/
+
+# Cocotb / Verilator
+sim_build/
+results.xml
+
+# Generated result artifacts
+results/*.png
+results/*.npy
+
+.idea/
+model/.idea/

@@ -97,9 +97,7 @@ def simulate(H, check_nodes, var_nodes, snr_db):
 
 def main():
 
-    H, check_nodes, var_nodes = load_alist(
-        r"C:\Users\moahs\Workspace\LDPC-FPGA-Decoder\matrices\CCSDS_ldpc_n512_k256.alist"
-    )
+    H, check_nodes, var_nodes = load_alist(r"C:\Users\moahs\Workspace\LDPC-FPGA-Decoder\matrices\CCSDS_ldpc_n512_k256.alist")
 
     print("H shape:", H.shape)
     print("Min row weight:", min(len(c) for c in check_nodes))
