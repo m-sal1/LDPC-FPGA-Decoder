@@ -5,28 +5,44 @@ module decoder_iteration #(
 
 )(
 
-    input  logic signed [WIDTH-1:0] llr_in,
+    input logic signed [WIDTH-1:0] llr_in,
 
-    input  logic signed [WIDTH-1:0] vn_to_cn [0:DEGREE-1],
+    input logic signed [WIDTH-1:0]
+        vn_to_cn [0:DEGREE-1],
 
-    output logic signed [WIDTH-1:0] cn_to_vn [0:DEGREE-1],
+    // FIX: Changed from 'input' to 'output' to resolve Error 12012
+    // Renamed to 'cn_to_vn_out' to expose the true CNU calculations
+    output logic signed [WIDTH-1:0]
+        cn_to_vn_out [0:DEGREE-1],
 
-    output logic signed [WIDTH-1:0] updated_vn_to_cn [0:DEGREE-1],
+    output logic signed [WIDTH-1:0]
+        updated_vn_to_cn [0:DEGREE-1],
 
-    output logic signed [WIDTH-1:0] decision_llr
+    output logic signed [WIDTH-1:0]
+        decision_llr
 
 );
 
-    // Internal wires between CNU and VNU
-    logic signed [WIDTH-1:0] cnu_out [0:DEGREE-1];
+    // -------------------------------------------------
+    // Internal CNU output
+    // -------------------------------------------------
+
+    logic signed [WIDTH-1:0]
+        cnu_out [0:DEGREE-1];
+
+    // FIX: Wire the internal CNU messages directly to our new output port
+    // so the vn_update_unit in the top level can read them
+    assign cn_to_vn_out = cnu_out;
 
     // -------------------------------------------------
     // CHECK NODE UNIT
     // -------------------------------------------------
 
     cnu #(
+
         .DEGREE(DEGREE),
         .WIDTH(WIDTH)
+
     ) cnu_inst (
 
         .msg_in(vn_to_cn),
@@ -40,8 +56,10 @@ module decoder_iteration #(
     // -------------------------------------------------
 
     vnu #(
+
         .DEGREE(DEGREE),
         .WIDTH(WIDTH)
+
     ) vnu_inst (
 
         .llr_in(llr_in),
@@ -53,8 +71,5 @@ module decoder_iteration #(
         .decision_llr(decision_llr)
 
     );
-
-    // Optional external visibility
-    assign cn_to_vn = cnu_out;
 
 endmodule
