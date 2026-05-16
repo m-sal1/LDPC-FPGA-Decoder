@@ -1,0 +1,209 @@
+module ldpc_decoder_top #(
+
+    parameter WIDTH          = 8,
+    parameter DEGREE         = 8,
+    parameter NUM_EDGES      = 4096,
+    parameter ADDR_WIDTH     = 12,
+    parameter MAX_ITERATIONS = 10
+
+)(
+
+    input logic clk,
+    input logic rst,
+
+    input logic start,
+
+    input logic signed [WIDTH-1:0] llr_in,
+
+    output logic decoding_done,
+
+    output logic signed [WIDTH-1:0] decision_llr
+
+);
+
+    // -------------------------------------------------
+    // Controller Signals
+    // -------------------------------------------------
+
+    logic iteration_enable;
+
+    logic [7:0] iteration_count;
+
+    // -------------------------------------------------
+    // Address Generator Signals
+    // -------------------------------------------------
+
+    logic [ADDR_WIDTH-1:0] edge_addr;
+
+    logic iteration_done;
+
+    // -------------------------------------------------
+    // Edge ROM Signals
+    // -------------------------------------------------
+
+    logic [9:0] vn_index;
+
+    logic [9:0] cn_index;
+
+    // -------------------------------------------------
+    // Message Memory Signals
+    // -------------------------------------------------
+
+    logic mem_we;
+
+    logic mem_re;
+
+    logic signed [WIDTH-1:0] mem_read_data;
+
+    logic signed [WIDTH-1:0] mem_write_data;
+
+    // -------------------------------------------------
+    // Decoder Iteration Signals
+    // -------------------------------------------------
+
+    logic signed [WIDTH-1:0] vn_to_cn [0:DEGREE-1];
+
+    logic signed [WIDTH-1:0] cn_to_vn [0:DEGREE-1];
+
+    logic signed [WIDTH-1:0] updated_vn_to_cn [0:DEGREE-1];
+
+    // -------------------------------------------------
+    // Iteration Controller
+    // -------------------------------------------------
+
+    iteration_controller #(
+
+        .MAX_ITERATIONS(MAX_ITERATIONS)
+
+    ) controller_inst (
+
+        .clk(clk),
+        .rst(rst),
+
+        .start(start),
+
+        .syndrome_valid(1'b0),
+
+        .decoding_done(decoding_done),
+
+        .iteration_enable(iteration_enable),
+
+        .iteration_count(iteration_count)
+
+    );
+
+    // -------------------------------------------------
+    // Address Generator
+    // -------------------------------------------------
+
+    address_generator #(
+
+        .NUM_EDGES(NUM_EDGES),
+        .ADDR_WIDTH(ADDR_WIDTH)
+
+    ) addr_gen_inst (
+
+        .clk(clk),
+        .rst(rst),
+
+        .enable(iteration_enable),
+
+        .edge_addr(edge_addr),
+
+        .iteration_done(iteration_done)
+
+    );
+
+    // -------------------------------------------------
+    // Edge ROM
+    // -------------------------------------------------
+
+    edge_rom edge_rom_inst (
+
+        .clk(clk),
+
+        .edge_addr(edge_addr),
+
+        .vn_index(vn_index),
+
+        .cn_index(cn_index)
+
+    );
+
+    // -------------------------------------------------
+    // Message Memory
+    // -------------------------------------------------
+
+    message_memory #(
+
+        .WIDTH(WIDTH),
+        .DEPTH(NUM_EDGES)
+
+    ) memory_inst (
+
+        .clk(clk),
+
+        .we(mem_we),
+
+        .write_addr(edge_addr),
+
+        .write_data(mem_write_data),
+
+        .re(mem_re),
+
+        .read_addr(edge_addr),
+
+        .read_data(mem_read_data)
+
+    );
+
+    // -------------------------------------------------
+    // Decoder Iteration Engine
+    // -------------------------------------------------
+
+    decoder_iteration #(
+
+        .WIDTH(WIDTH),
+        .DEGREE(DEGREE)
+
+    ) iteration_inst (
+
+        .llr_in(llr_in),
+
+        .vn_to_cn(vn_to_cn),
+
+        .cn_to_vn(cn_to_vn),
+
+        .updated_vn_to_cn(updated_vn_to_cn),
+
+        .decision_llr(decision_llr)
+
+    );
+
+    // -------------------------------------------------
+    // Placeholder Memory Flow
+    // -------------------------------------------------
+
+    assign mem_we = iteration_enable;
+
+    assign mem_re = iteration_enable;
+
+    assign mem_write_data = updated_vn_to_cn[0];
+
+    // -------------------------------------------------
+    // Temporary VN Input Broadcast
+    // -------------------------------------------------
+
+    genvar i;
+
+    generate
+
+        for (i = 0; i < DEGREE; i++) begin : vn_input_assign
+
+            assign vn_to_cn[i] = mem_read_data;
+
+        end
+
+    endgenerate
+
+endmodule

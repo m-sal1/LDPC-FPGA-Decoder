@@ -27,13 +27,19 @@ module vnu #(
 
         input signed [WIDTH+2:0] value;
 
+        localparam signed [WIDTH+2:0] MAX_VAL =
+            (2**(WIDTH-1)) - 1;
+
+        localparam signed [WIDTH+2:0] MIN_VAL =
+            -(2**(WIDTH-1));
+
         begin
 
-            if (value > ((1 << (WIDTH-1)) - 1))
-                saturate = (1 << (WIDTH-1)) - 1;
+            if (value > MAX_VAL)
+                saturate = MAX_VAL[WIDTH-1:0];
 
-            else if (value < -(1 << (WIDTH-1)))
-                saturate = -(1 << (WIDTH-1));
+            else if (value < MIN_VAL)
+                saturate = MIN_VAL[WIDTH-1:0];
 
             else
                 saturate = value[WIDTH-1:0];
@@ -53,6 +59,7 @@ module vnu #(
 
         // Final decision LLR
         decision_sat = saturate(total);
+
         decision_llr = decision_sat;
 
         // Extrinsic message generation

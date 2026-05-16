@@ -1,0 +1,39 @@
+module edge_rom #(
+
+    parameter EDGE_COUNT = 2048,
+    parameter ADDR_WIDTH = 12,
+    parameter VN_WIDTH   = 10,
+    parameter CN_WIDTH   = 10
+
+)(
+
+    input  logic clk,
+
+    input  logic [ADDR_WIDTH-1:0] edge_addr,
+
+    output logic [VN_WIDTH-1:0] vn_index,
+    output logic [CN_WIDTH-1:0] cn_index
+
+);
+
+    // EDGE MEMORY
+
+    logic [VN_WIDTH+CN_WIDTH-1:0] edge_memory [0:EDGE_COUNT-1];
+
+    // ROM INITIALIZATION
+
+    initial begin
+
+        $readmemb("edge_map.mem", edge_memory);
+
+    end
+
+    // SYNCHRONOUS READ
+
+    always_ff @(posedge clk) begin
+
+        {vn_index, cn_index} <= edge_memory[edge_addr];
+
+    end
+
+endmodule
