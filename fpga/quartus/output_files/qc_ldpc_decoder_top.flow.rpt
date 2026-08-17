@@ -1,0 +1,129 @@
+Flow report for qc_ldpc_decoder_top
+Sun Aug 16 15:42:29 2026
+Quartus Prime Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Flow Summary
+  3. Flow Settings
+  4. Flow Non-Default Global Settings
+  5. Flow Elapsed Time
+  6. Flow OS Summary
+  7. Flow Log
+  8. Flow Messages
+  9. Flow Suppressed Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2023  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.
+
+
+
++----------------------------------------------------------------------------------+
+; Flow Summary                                                                     ;
++---------------------------------+------------------------------------------------+
+; Flow Status                     ; Successful - Sun Aug 16 15:42:08 2026          ;
+; Quartus Prime Version           ; 22.1std.2 Build 922 07/20/2023 SC Lite Edition ;
+; Revision Name                   ; qc_ldpc_decoder_top                            ;
+; Top-level Entity Name           ; de1_soc_ldpc_top                               ;
+; Family                          ; Cyclone V                                      ;
+; Device                          ; 5CSEMA5F31C6                                   ;
+; Timing Models                   ; Final                                          ;
+; Logic utilization (in ALMs)     ; 15,181 / 32,070 ( 47 % )                       ;
+; Total registers                 ; 27964                                          ;
+; Total pins                      ; 15 / 457 ( 3 % )                               ;
+; Total virtual pins              ; 0                                              ;
+; Total block memory bits         ; 2,688 / 4,065,280 ( < 1 % )                    ;
+; Total DSP Blocks                ; 0 / 87 ( 0 % )                                 ;
+; Total HSSI RX PCSs              ; 0                                              ;
+; Total HSSI PMA RX Deserializers ; 0                                              ;
+; Total HSSI TX PCSs              ; 0                                              ;
+; Total HSSI PMA TX Serializers   ; 0                                              ;
+; Total PLLs                      ; 0 / 6 ( 0 % )                                  ;
+; Total DLLs                      ; 0 / 4 ( 0 % )                                  ;
++---------------------------------+------------------------------------------------+
+
+
++-----------------------------------------+
+; Flow Settings                           ;
++-------------------+---------------------+
+; Option            ; Setting             ;
++-------------------+---------------------+
+; Start date & time ; 08/16/2026 15:18:46 ;
+; Main task         ; Compilation         ;
+; Revision Name     ; qc_ldpc_decoder_top ;
++-------------------+---------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                                                                                   ;
++-------------------------------------+----------------------------------------+---------------------+------------------+------------+
+; Assignment Name                     ; Value                                  ; Default Value       ; Entity Name      ; Section Id ;
++-------------------------------------+----------------------------------------+---------------------+------------------+------------+
+; COMPILER_SIGNATURE_ID               ; 1096066365859.178688272610588          ; --                  ; --               ; --         ;
+; MAX_CORE_JUNCTION_TEMP              ; 85                                     ; --                  ; --               ; --         ;
+; MIN_CORE_JUNCTION_TEMP              ; 0                                      ; --                  ; --               ; --         ;
+; PARTITION_COLOR                     ; -- (Not supported for targeted family) ; --                  ; de1_soc_ldpc_top ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL ; -- (Not supported for targeted family) ; --                  ; de1_soc_ldpc_top ; Top        ;
+; PARTITION_NETLIST_TYPE              ; -- (Not supported for targeted family) ; --                  ; de1_soc_ldpc_top ; Top        ;
+; POWER_BOARD_THERMAL_MODEL           ; None (CONSERVATIVE)                    ; --                  ; --               ; --         ;
+; POWER_PRESET_COOLING_SOLUTION       ; 23 MM HEAT SINK WITH 200 LFPM AIRFLOW  ; --                  ; --               ; --         ;
+; PROJECT_OUTPUT_DIRECTORY            ; output_files                           ; --                  ; --               ; --         ;
+; TOP_LEVEL_ENTITY                    ; de1_soc_ldpc_top                       ; qc_ldpc_decoder_top ; --               ; --         ;
++-------------------------------------+----------------------------------------+---------------------+------------------+------------+
+
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Flow Elapsed Time                                                                                                        ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+; Analysis & Synthesis ; 00:01:24     ; 3.2                     ; 5321 MB             ; 00:02:42                           ;
+; Fitter               ; 00:21:25     ; 1.2                     ; 8282 MB             ; 02:00:09                           ;
+; Assembler            ; 00:00:13     ; 1.0                     ; 5462 MB             ; 00:00:14                           ;
+; Timing Analyzer      ; 00:00:19     ; 6.9                     ; 5906 MB             ; 00:01:49                           ;
+; Total                ; 00:23:21     ; --                      ; --                  ; 02:04:54                           ;
++----------------------+--------------+-------------------------+---------------------+------------------------------------+
+
+
++------------------------------------------------------------------------------------+
+; Flow OS Summary                                                                    ;
++----------------------+------------------+------------+------------+----------------+
+; Module Name          ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
++----------------------+------------------+------------+------------+----------------+
+; Analysis & Synthesis ; Mostafa          ; Windows 10 ; 10.0       ; x86_64         ;
+; Fitter               ; Mostafa          ; Windows 10 ; 10.0       ; x86_64         ;
+; Assembler            ; Mostafa          ; Windows 10 ; 10.0       ; x86_64         ;
+; Timing Analyzer      ; Mostafa          ; Windows 10 ; 10.0       ; x86_64         ;
++----------------------+------------------+------------+------------+----------------+
+
+
+------------
+; Flow Log ;
+------------
+quartus_map --read_settings_files=on --write_settings_files=off ldpc_qc_decoder -c qc_ldpc_decoder_top
+quartus_fit --read_settings_files=off --write_settings_files=off ldpc_qc_decoder -c qc_ldpc_decoder_top
+quartus_asm --read_settings_files=off --write_settings_files=off ldpc_qc_decoder -c qc_ldpc_decoder_top
+quartus_sta ldpc_qc_decoder -c qc_ldpc_decoder_top
+
+
+

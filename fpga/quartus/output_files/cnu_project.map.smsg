@@ -1,0 +1,1 @@
+Info (10281): Verilog HDL Declaration information at vnu.sv(2): object "DEGREE" differs only in case from object "degree" in the same scope File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 2

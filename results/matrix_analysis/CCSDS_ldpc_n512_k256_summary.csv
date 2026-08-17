@@ -1,0 +1,2 @@
+matrix,CNs,VNs,rank,dimension_k,code_rate,total_edges,average_CN_degree,average_VN_degree,minimum_CN_degree,maximum_CN_degree,minimum_VN_degree,maximum_VN_degree,CN_regular,VN_regular,LDPC_type,edge_consistency,full_row_rank
+CCSDS_ldpc_n512_k256,256,512,256,256,0.5,2048,8.0,4.0,8,8,3,5,True,False,IRREGULAR,True,True

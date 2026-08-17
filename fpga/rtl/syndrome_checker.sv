@@ -16,16 +16,12 @@ module syndrome_checker #(
 
 );
 
-    // -------------------------------------------------
     // Check-node connectivity ROM
-    // -------------------------------------------------
 
     logic [VN_WIDTH*MAX_ROW_WEIGHT-1:0]
         check_node_map [0:NUM_CHECK_NODES-1];
 
-    // -------------------------------------------------
     // Internal signals
-    // -------------------------------------------------
 
     integer cn;
     integer vn_idx;
@@ -35,9 +31,7 @@ module syndrome_checker #(
 
     logic all_checks_passed;
 
-    // -------------------------------------------------
     // ROM Initialization
-    // -------------------------------------------------
 
     initial begin
 
@@ -48,9 +42,7 @@ module syndrome_checker #(
 
     end
 
-    // -------------------------------------------------
     // Syndrome Evaluation
-    // -------------------------------------------------
 
     always_comb begin
 

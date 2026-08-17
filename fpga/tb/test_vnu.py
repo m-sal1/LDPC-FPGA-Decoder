@@ -1,113 +1,78 @@
-import random
+# VNU randomised regression testbench (degrees 3, 4, 5 for CCSDS)
+# Moustafa Salman
 
+import random
 import cocotb
 from cocotb.triggers import Timer
 
-
-# =========================================================
-# PYTHON GOLDEN MODEL
-# =========================================================
-
-WIDTH = 8
-MAX_VAL = (1 << (WIDTH - 1)) - 1
+WIDTH   = 8
+DEGREE  = 5
+MAX_VAL =  (1 << (WIDTH - 1)) - 1
 MIN_VAL = -(1 << (WIDTH - 1))
 
 
 def saturate(value):
-
-    if value > MAX_VAL:
-        return MAX_VAL
-
-    if value < MIN_VAL:
-        return MIN_VAL
-
-    return value
+    return max(MIN_VAL, min(MAX_VAL, value))
 
 
-def vnu_reference(llr_in, msgs):
-
-    total = llr_in + sum(msgs)
-
+def vnu_reference(llr_in, msgs, degree):
+    """
+    Golden model for the variable node update.
+    Only the first `degree` message slots are active; unused slots are 0.
+    Returns extrinsic outputs for all DEGREE slots and the decision LLR.
+    """
+    total        = llr_in + sum(msgs[:degree])
     decision_llr = saturate(total)
 
     outputs = []
+    for i in range(degree):
+        outputs.append(saturate(total - msgs[i]))  # extrinsic = total minus own message
 
-    for i in range(len(msgs)):
-
-        extrinsic = total - msgs[i]
-
-        outputs.append(saturate(extrinsic))
+    # Unused slots output 0
+    for _ in range(DEGREE - degree):
+        outputs.append(0)
 
     return outputs, decision_llr
 
 
-# =========================================================
-# RANDOMIZED REGRESSION TEST
-# =========================================================
-
 @cocotb.test()
 async def vnu_randomized_regression(dut):
-
-    NUM_TESTS = 1000
-
-    print("\n==============================")
-    print("VNU RANDOMIZED REGRESSION")
-    print("==============================")
+    NUM_TESTS  = 1000
+    VALID_DEGS = [3, 4, 5]  # degree distribution in CCSDS n512_k256
 
     for test_num in range(NUM_TESTS):
-
+        degree = random.choice(VALID_DEGS)
         llr_in = random.randint(-127, 127)
 
-        test_vector = [
-            random.randint(-127, 127)
-            for _ in range(3)
-        ]
+        # Active messages padded with zeros for unused slots
+        valid_msgs = [random.randint(-127, 127) for _ in range(degree)]
+        all_msgs   = valid_msgs + [0] * (DEGREE - degree)
 
-        expected_outputs, expected_decision = \
-            vnu_reference(llr_in, test_vector)
-
-        # -------------------------------------------------
-        # DRIVE INPUTS
-        # -------------------------------------------------
+        expected_outputs, expected_decision = vnu_reference(llr_in, all_msgs, degree)
 
         dut.llr_in.value = llr_in
-
-        for i in range(3):
-            dut.msg_in[i].value = test_vector[i]
+        dut.degree.value = degree
+        for i in range(DEGREE):
+            dut.msg_in[i].value = all_msgs[i]
 
         await Timer(1, unit="ns")
 
-        # -------------------------------------------------
-        # CHECK EXTRINSIC OUTPUTS
-        # -------------------------------------------------
-
-        for i in range(3):
-
-            rtl_output = dut.msg_out[i].value.to_signed()
-
-            assert rtl_output == expected_outputs[i], (
-                f"\nMismatch detected!\n"
-                f"Test #{test_num}\n"
-                f"LLR input: {llr_in}\n"
-                f"Input vector: {test_vector}\n"
-                f"msg_out[{i}] RTL={rtl_output} "
-                f"EXPECTED={expected_outputs[i]}"
+        for i in range(DEGREE):
+            rtl = dut.msg_out[i].value.to_signed()
+            assert rtl == expected_outputs[i], (
+                f"Test {test_num}: msg_out[{i}] RTL={rtl} "
+                f"expected={expected_outputs[i]} "
+                f"degree={degree} llr={llr_in} msgs={all_msgs}"
             )
 
-        # -------------------------------------------------
-        # CHECK DECISION LLR
-        # -------------------------------------------------
-
-        rtl_decision = dut.decision_llr.value.to_signed()
-
-        assert rtl_decision == expected_decision, (
-            f"\nDecision mismatch!\n"
-            f"RTL={rtl_decision} "
-            f"EXPECTED={expected_decision}"
+        rtl_dec = dut.decision_llr.value.to_signed()
+        assert rtl_dec == expected_decision, (
+            f"Test {test_num}: decision_llr RTL={rtl_dec} "
+            f"expected={expected_decision} "
+            f"degree={degree} llr={llr_in} msgs={all_msgs}"
         )
 
-        # Progress indicator
         if test_num % 100 == 0:
-            print(f"Passed {test_num}/{NUM_TESTS}")
+            print(f"  Passed {test_num}/{NUM_TESTS} (degree={degree})")
 
-    print("\nAll VNU regression tests PASSED.")
+    print("All VNU regression tests PASSED.")
