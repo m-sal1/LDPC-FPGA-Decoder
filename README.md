@@ -78,7 +78,7 @@ pyinstaller --onefile --windowed --name "Reconciler" ^
     gui/sim_gui.py
 ```
 
-Output: `dist/Reconciler.exe`
+Output: `Reconciler/Reconciler.exe`
 
 ---
 
