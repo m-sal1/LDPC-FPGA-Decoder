@@ -1,19 +1,7 @@
-// =============================================================================
 // iteration_controller.sv
-//
-// CN-serial flooding-schedule LDPC decoder FSM.
-// Handles IRREGULAR variable node degrees (col weights 3..5 for CCSDS n512_k256).
-// LLR-initialised VC bank: matches decoder.py msg_vc[i,j] = llr[j] init.
-//
-// Parameters (CCSDS n512_k256):
-//   NUM_VN      = 512
-//   NUM_CN      = 256
-//   NUM_EDGES   = 2048
-//   ROW_WEIGHT  = 8     (regular - all CNs identical)
-//   MAX_VN_DEG  = 5     (max col weight - VNU port width)
-//   MSG_WIDTH   = 8
-//   MAX_ITER    = 50
-// =============================================================================
+// Controls the CN-serial flooding schedule and coordinates each LDPC decoding iteration.
+// Handles the irregular variable-node degrees used by the CCSDS n512_k256 code.
+// Moustafa Salman
 
 module iteration_controller #(
     parameter int NUM_VN     = 512,
@@ -35,54 +23,54 @@ module iteration_controller #(
     output logic [$clog2(NUM_VN)-1:0]    llr_rd_addr,
     input  logic signed [MSG_WIDTH-1:0]  llr_rd_data,
 
-    // vc_message_bank (VN->CN, edge-indexed)
+    // VN-to-CN message bank
     output logic [$clog2(NUM_EDGES)-1:0] vc_wr_addr,
-    output logic signed [MSG_WIDTH-1:0]  vc_wr_data,
+    output logic signed [MSG_WIDTH-1:0] vc_wr_data,
     output logic                         vc_wr_en,
     output logic [$clog2(NUM_EDGES)-1:0] vc_rd_addr,
     input  logic signed [MSG_WIDTH-1:0]  vc_rd_data,
 
-    // cv_message_bank (CN->VN, edge-indexed)
+    // CN-to-VN message bank
     output logic [$clog2(NUM_EDGES)-1:0] cv_wr_addr,
-    output logic signed [MSG_WIDTH-1:0]  cv_wr_data,
+    output logic signed [MSG_WIDTH-1:0] cv_wr_data,
     output logic                         cv_wr_en,
     output logic [$clog2(NUM_EDGES)-1:0] cv_rd_addr,
     input  logic signed [MSG_WIDTH-1:0]  cv_rd_data,
 
     // cn_rom: {edge_id[10:0], vn_index[8:0]} packed 20 bits
     output logic [$clog2(NUM_EDGES)-1:0] cn_rom_addr,
-    input  logic [19:0]                  cn_rom_data,
+    input logic [19:0]                  cn_rom_data,
 
     // vn_rom: {cn_index[7:0], edge_id[10:0]} packed 20 bits
     output logic [$clog2(NUM_EDGES)-1:0] vn_rom_addr,
-    input  logic [19:0]                  vn_rom_data,
+    input logic [19:0]                  vn_rom_data,
 
-    // vn_degree_rom: actual degree of each VN (3..5)
+    // Stores the actual degree of each variable node.
     output logic [$clog2(NUM_VN)-1:0]    deg_rom_addr,
-    input  logic [3:0]                   deg_rom_data,
+    input logic [3:0]                   deg_rom_data,
 
-    // CNU (2-stage pipeline)
+    // CNU interface
     output logic                         cnu_valid_in,
-    input  logic                         cnu_valid_out,
+    input logic                          cnu_valid_out,
     output logic signed [MSG_WIDTH-1:0]  cnu_msg_in  [ROW_WEIGHT],
-    input  logic signed [MSG_WIDTH-1:0]  cnu_msg_out [ROW_WEIGHT],
+    input logic signed [MSG_WIDTH-1:0]   cnu_msg_out [ROW_WEIGHT],
 
-    // VNU (combinational)
+    // VNU interface
     output logic signed [MSG_WIDTH-1:0]  vnu_msg_in  [MAX_VN_DEG],
     output logic signed [MSG_WIDTH-1:0]  vnu_llr_in,
     output logic [2:0]                   vnu_degree,
-    input  logic signed [MSG_WIDTH-1:0]  vnu_extrinsic [MAX_VN_DEG],
-    input  logic signed [MSG_WIDTH-1:0]  vnu_belief,
+    input logic signed [MSG_WIDTH-1:0]   vnu_extrinsic [MAX_VN_DEG],
+    input logic signed [MSG_WIDTH-1:0]   vnu_belief,
 
     // Syndrome checker
-    input  logic                         syn_pass,
-    output logic                         syn_start,
-    input  logic                         syn_done,
+    input logic                         syn_pass,
+    output logic                        syn_start,
+    input logic                         syn_done,
 
     // Decoded bits
     output logic [$clog2(NUM_VN)-1:0]   dec_wr_addr,
-    output logic                         dec_wr_data,
-    output logic                         dec_wr_en
+    output logic                        dec_wr_data,
+    output logic                        dec_wr_en
 );
 
     typedef enum logic [4:0] {
@@ -123,11 +111,11 @@ module iteration_controller #(
     logic [$clog2(NUM_EDGES)-1:0]    vn_edge_base;
     logic [2:0]                      current_vn_degree;
 
-    // Pipeline registers for INIT LLR initialisation
+    // Pipeline registers used while initialising the VN-to-CN messages.
     logic [$clog2(NUM_EDGES)-1:0]    init_addr_d1;
     logic [$clog2(NUM_EDGES)-1:0]    init_addr_d2;
 
-    // Message buffers
+    // Temporary buffers for the messages being processed by the CNU and VNU.
     logic signed [MSG_WIDTH-1:0]     cnu_buf      [ROW_WEIGHT];
     logic [$clog2(NUM_EDGES)-1:0]    cn_edge_ids  [ROW_WEIGHT];
     logic signed [MSG_WIDTH-1:0]     vnu_buf      [MAX_VN_DEG];
@@ -184,21 +172,18 @@ module iteration_controller #(
                         init_addr_d1 <= '0;
                         init_addr_d2 <= '0;
                         vn_edge_base <= '0;
-                        // Pre-issue first VN ROM read for INIT pipeline
+                        // Prime the VN adjacency read before starting the initialisation pipeline.
                         vn_rom_addr <= '0;
                         state       <= S_INIT;
                     end
                 end
 
-                // ─────────────────────────────────────────────────────────
-                // INIT: initialise vc_bank with channel LLRs
-                // Pipeline: vn_rom -> llr_bank -> vc_bank write
-                // Also zero cv_bank simultaneously
-                // ─────────────────────────────────────────────────────────
+                // Initialise the VN-to-CN bank with the channel LLR for each edge.
+                // The ROM and LLR reads are pipelined while the CN-to-VN bank is cleared.
                 S_INIT: begin
-                    // Issue vn_rom read for current edge
+                    // Request the VN entry for the current edge.
                     vn_rom_addr  <= init_addr[$clog2(NUM_EDGES)-1:0];
-                    // Zero cv_bank
+                    // Clear the corresponding CN-to-VN message.
                     cv_wr_addr   <= init_addr[$clog2(NUM_EDGES)-1:0];
                     cv_wr_data   <= '0;
                     cv_wr_en     <= 1'b1;
@@ -213,10 +198,10 @@ module iteration_controller #(
                 end
 
                 S_INIT_VN_WAIT: begin
-                    // vn_rom_data valid - extract vn_index, issue LLR read
+                    // The VN ROM result is available here, so request the corresponding channel LLR.
                     llr_rd_addr  <= vn_rom_data[8:0];
                     init_addr_d2 <= init_addr_d1;
-                    // Pipeline next edge
+                    // Keep the next edge moving through the pipeline.
                     if (init_addr < $bits(init_addr)'(NUM_EDGES)) begin
                         vn_rom_addr  <= init_addr[$clog2(NUM_EDGES)-1:0];
                         cv_wr_addr   <= init_addr[$clog2(NUM_EDGES)-1:0];
@@ -231,11 +216,11 @@ module iteration_controller #(
                 end
 
                 S_INIT_LLR_WAIT: begin
-                    // LLR valid - write to vc_bank[init_addr_d2]
+                    // Write the channel LLR to the edge selected by the delayed address.
                     vc_wr_addr <= init_addr_d2;
                     vc_wr_data <= llr_rd_data;
                     vc_wr_en   <= 1'b1;
-                    // Continue pipeline
+                    // Continue feeding the pipeline until every edge has been initialised.
                     if (init_addr <= $bits(init_addr)'(NUM_EDGES)) begin
                         llr_rd_addr  <= vn_rom_data[8:0];
                         init_addr_d2 <= init_addr_d1;
@@ -259,7 +244,8 @@ module iteration_controller #(
                     end
                 end
 
-                // ── CN PHASE ──────────────────────────────────────────────
+                // CN phase: gather all VN-to-CN messages for one check node,
+                // run the CNU, then write the resulting CN-to-VN messages back.
                 S_CN_ROM_REQ: begin
                     cn_rom_addr <= $clog2(NUM_EDGES)'(cn_index * ROW_WEIGHT) + $clog2(NUM_EDGES)'(cn_slot);
                     state       <= S_CN_ROM_WAIT;
@@ -288,28 +274,28 @@ module iteration_controller #(
                 end
 
                 S_CN_COMPUTE: begin
-                    // Assert valid_in to start 2-stage CNU pipeline
+                    // Start the CNU pipeline once all messages for the check node are ready.
                     cnu_valid_in <= 1'b1;
                     state        <= S_CN_PIPE1;
                 end
 
                 S_CN_PIPE1: begin
-                    // Stage 1 registered (abs+signs) — wait for stage 2
+                    // Allow the first CNU pipeline stage to complete.
                     state <= S_CN_PIPE2;
                 end
 
                 S_CN_PIPE2: begin
-                    // Stage 2 registered (min-search done)
+                    // Allow the second CNU pipeline stage to complete.
                     state <= S_CN_PIPE3;
                 end
 
                 S_CN_PIPE3: begin
-                    // Stage 3 registered (merge done)
+                    // Allow the third CNU pipeline stage to complete.
                     state <= S_CN_PIPE4;
                 end
 
                 S_CN_PIPE4: begin
-                    // valid_out asserts this cycle — stage 4 output ready
+                    // The pipelined CNU result is ready for writeback.
                     state <= S_CN_WRITEBACK;
                 end
 
@@ -334,7 +320,8 @@ module iteration_controller #(
                     end
                 end
 
-                // ── VN PHASE ──────────────────────────────────────────────
+                // VN phase: load the variable-node degree and all connected
+                // CN-to-VN messages before calculating the new VN outputs.
                 S_VN_DEG_REQ: begin
                     deg_rom_addr <= vn_index;
                     state        <= S_VN_DEG_WAIT;
@@ -406,6 +393,7 @@ module iteration_controller #(
                 end
 
                 S_SYNDROME: begin
+                    // Check the current hard decisions before starting another iteration.
                     if (syn_done) begin
                         if (syn_pass) begin
                             converged <= 1'b1;

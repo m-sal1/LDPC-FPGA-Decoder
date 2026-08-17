@@ -1,5 +1,5 @@
 Analysis & Synthesis report for de1_soc_ccsds_top
-Sun Aug 16 16:04:49 2026
+Mon Aug 17 23:38:52 2026
 Quartus Prime Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
 
 
@@ -86,7 +86,7 @@ https://fpgasoftware.intel.com/eula.
 +----------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                     ;
 +---------------------------------+------------------------------------------------+
-; Analysis & Synthesis Status     ; Successful - Sun Aug 16 16:04:49 2026          ;
+; Analysis & Synthesis Status     ; Successful - Mon Aug 17 23:38:52 2026          ;
 ; Quartus Prime Version           ; 22.1std.2 Build 922 07/20/2023 SC Lite Edition ;
 ; Revision Name                   ; de1_soc_ccsds_top                              ;
 ; Top-level Entity Name           ; de1_soc_ccsds_top                              ;
@@ -209,9 +209,7 @@ https://fpgasoftware.intel.com/eula.
 ;     Processor 2            ;   0.0%      ;
 ;     Processor 3            ;   0.0%      ;
 ;     Processor 4            ;   0.0%      ;
-;     Processor 5            ;   0.0%      ;
-;     Processor 6            ;   0.0%      ;
-;     Processors 7-16        ;   0.0%      ;
+;     Processors 5-16        ;   0.0%      ;
 +----------------------------+-------------+
 
 
@@ -1453,7 +1451,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 +----------------+--------------+
 ; Partition Name ; Elapsed Time ;
 +----------------+--------------+
-; Top            ; 00:00:04     ;
+; Top            ; 00:00:08     ;
 +----------------+--------------+
 
 
@@ -1463,54 +1461,54 @@ Note: In order to hide this table in the UI and the text report file, please set
 Info: *******************************************************************
 Info: Running Quartus Prime Analysis & Synthesis
     Info: Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
-    Info: Processing started: Sun Aug 16 16:04:38 2026
+    Info: Processing started: Mon Aug 17 23:38:32 2026
 Info: Command: quartus_map --read_settings_files=on --write_settings_files=off ccsds_ldpc_decoder -c de1_soc_ccsds_top
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 16 of the 16 processors detected
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/vnu.sv
-    Info (12023): Found entity 1: vnu File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 1
+    Info (12023): Found entity 1: vnu File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/vn_rom.sv
     Info (12023): Found entity 1: vn_rom File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_rom.sv Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/vn_degree_rom.sv
-    Info (12023): Found entity 1: vn_degree_rom File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 4
+    Info (12023): Found entity 1: vn_degree_rom File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/syndrome_checker.sv
-    Info (12023): Found entity 1: syndrome_checker File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/syndrome_checker.sv Line: 1
+    Info (12023): Found entity 1: syndrome_checker File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/syndrome_checker.sv Line: 4
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/llr_bank.sv
-    Info (12023): Found entity 1: llr_bank File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/llr_bank.sv Line: 1
+    Info (12023): Found entity 1: llr_bank File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/llr_bank.sv Line: 4
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/ldpc_decoder_top.sv
-    Info (12023): Found entity 1: ldpc_decoder_top File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 9
+    Info (12023): Found entity 1: ldpc_decoder_top File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/iteration_controller.sv
-    Info (12023): Found entity 1: iteration_controller File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/iteration_controller.sv Line: 18
+    Info (12023): Found entity 1: iteration_controller File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/iteration_controller.sv Line: 6
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/edge_message_bank.sv
-    Info (12023): Found entity 1: edge_message_bank File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/edge_message_bank.sv Line: 1
+    Info (12023): Found entity 1: edge_message_bank File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/edge_message_bank.sv Line: 5
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/cnu.sv
-    Info (12023): Found entity 1: cnu File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cnu.sv Line: 17
+    Info (12023): Found entity 1: cnu File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cnu.sv Line: 6
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/cn_rom.sv
-    Info (12023): Found entity 1: cn_rom File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 5
+    Info (12023): Found entity 1: cn_rom File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 7
 Info (12021): Found 1 design units, including 1 entities, in source file /users/moahs/workspace/ldpc-fpga-decoder/fpga/rtl/de1_soc_ccsds_top.sv
-    Info (12023): Found entity 1: de1_soc_ccsds_top File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 13
+    Info (12023): Found entity 1: de1_soc_ccsds_top File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 14
 Info (12127): Elaborating entity "de1_soc_ccsds_top" for the top level hierarchy
-Info (12128): Elaborating entity "ldpc_decoder_top" for hierarchy "ldpc_decoder_top:decoder" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 98
+Info (12128): Elaborating entity "ldpc_decoder_top" for hierarchy "ldpc_decoder_top:decoder" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 94
 Info (12128): Elaborating entity "llr_bank" for hierarchy "ldpc_decoder_top:decoder|llr_bank:llr_bank_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 120
 Info (12128): Elaborating entity "edge_message_bank" for hierarchy "ldpc_decoder_top:decoder|edge_message_bank:vc_bank_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 128
 Info (12128): Elaborating entity "cn_rom" for hierarchy "ldpc_decoder_top:decoder|cn_rom:cn_rom_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 142
-Warning (10030): Net "mem.data_a" at cn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 15
-Warning (10030): Net "mem.waddr_a" at cn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 15
-Warning (10030): Net "mem.we_a" at cn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 15
+Warning (10030): Net "mem.data_a" at cn_rom.sv(17) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 17
+Warning (10030): Net "mem.waddr_a" at cn_rom.sv(17) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 17
+Warning (10030): Net "mem.we_a" at cn_rom.sv(17) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/cn_rom.sv Line: 17
 Info (12128): Elaborating entity "vn_rom" for hierarchy "ldpc_decoder_top:decoder|vn_rom:vn_rom_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 148
 Warning (10030): Net "mem.data_a" at vn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_rom.sv Line: 15
 Warning (10030): Net "mem.waddr_a" at vn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_rom.sv Line: 15
 Warning (10030): Net "mem.we_a" at vn_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_rom.sv Line: 15
 Info (12128): Elaborating entity "vn_degree_rom" for hierarchy "ldpc_decoder_top:decoder|vn_degree_rom:deg_rom_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 154
-Warning (10030): Net "mem.data_a" at vn_degree_rom.sv(14) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 14
-Warning (10030): Net "mem.waddr_a" at vn_degree_rom.sv(14) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 14
-Warning (10030): Net "mem.we_a" at vn_degree_rom.sv(14) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 14
+Warning (10030): Net "mem.data_a" at vn_degree_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 15
+Warning (10030): Net "mem.waddr_a" at vn_degree_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 15
+Warning (10030): Net "mem.we_a" at vn_degree_rom.sv(15) has no driver or initial value, using a default initial value '0' File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vn_degree_rom.sv Line: 15
 Info (12128): Elaborating entity "cnu" for hierarchy "ldpc_decoder_top:decoder|cnu:cnu_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 160
 Info (12128): Elaborating entity "vnu" for hierarchy "ldpc_decoder_top:decoder|vnu:vnu_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 165
-Warning (10230): Verilog HDL assignment warning at vnu.sv(22): truncated value with size 32 to match size of target (13) File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 22
-Warning (10230): Verilog HDL assignment warning at vnu.sv(23): truncated value with size 32 to match size of target (13) File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 23
+Warning (10230): Verilog HDL assignment warning at vnu.sv(26): truncated value with size 32 to match size of target (13) File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 26
+Warning (10230): Verilog HDL assignment warning at vnu.sv(27): truncated value with size 32 to match size of target (13) File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/vnu.sv Line: 27
 Info (12128): Elaborating entity "syndrome_checker" for hierarchy "ldpc_decoder_top:decoder|syndrome_checker:syndrome_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 169
-Info (12128): Elaborating entity "iteration_controller" for hierarchy "ldpc_decoder_top:decoder|iteration_controller:ctrl_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 194
+Info (12128): Elaborating entity "iteration_controller" for hierarchy "ldpc_decoder_top:decoder|iteration_controller:ctrl_inst" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/ldpc_decoder_top.sv Line: 196
 Warning (276020): Inferred RAM node "ldpc_decoder_top:decoder|iteration_controller:ctrl_inst|cn_edge_ids_rtl_0" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.
 Warning (276020): Inferred RAM node "ldpc_decoder_top:decoder|iteration_controller:ctrl_inst|vn_edge_ids_rtl_0" from synchronous design logic.  Pass-through logic has been added to match the read-during-write behavior of the original design.
 Info (19000): Inferred 8 megafunctions from design logic
@@ -1777,29 +1775,29 @@ Warning (14284): Synthesized away the following node(s):
         Warning (14320): Synthesized away node "ldpc_decoder_top:decoder|vn_rom:vn_rom_inst|altsyncram:mem_rtl_0|altsyncram_75g1:auto_generated|ram_block1a19" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/quartus/db/altsyncram_75g1.tdf Line: 434
         Warning (14320): Synthesized away node "ldpc_decoder_top:decoder|vn_degree_rom:deg_rom_inst|altsyncram:mem_rtl_0|altsyncram_bog1:auto_generated|ram_block1a3" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/quartus/db/altsyncram_bog1.tdf Line: 98
 Warning (13024): Output pins are stuck at VCC or GND
-    Warning (13410): Pin "LEDR[5]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 17
-    Warning (13410): Pin "LEDR[6]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 17
-    Warning (13410): Pin "LEDR[7]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 17
-    Warning (13410): Pin "LEDR[8]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 17
+    Warning (13410): Pin "LEDR[5]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 18
+    Warning (13410): Pin "LEDR[6]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 18
+    Warning (13410): Pin "LEDR[7]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 18
+    Warning (13410): Pin "LEDR[8]" is stuck at GND File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 18
 Info (286030): Timing-Driven Synthesis is running
 Info (17049): 5 registers lost all their fanouts during netlist optimizations.
 Info (144001): Generated suppressed messages file C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/quartus/output_files/de1_soc_ccsds_top.map.smsg
 Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
     Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
 Warning (21074): Design contains 3 input pin(s) that do not drive logic
-    Warning (15610): No output dependent on input pin "KEY[1]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 15
-    Warning (15610): No output dependent on input pin "KEY[2]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 15
-    Warning (15610): No output dependent on input pin "KEY[3]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 15
+    Warning (15610): No output dependent on input pin "KEY[1]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 16
+    Warning (15610): No output dependent on input pin "KEY[2]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 16
+    Warning (15610): No output dependent on input pin "KEY[3]" File: C:/Users/moahs/Workspace/LDPC-FPGA-Decoder/fpga/rtl/de1_soc_ccsds_top.sv Line: 16
 Info (21057): Implemented 2564 device resources after synthesis - the final resource count might be different
     Info (21058): Implemented 5 input pins
     Info (21059): Implemented 10 output pins
     Info (21061): Implemented 2485 logic cells
     Info (21064): Implemented 64 RAM segments
 Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 45 warnings
-    Info: Peak virtual memory: 4933 megabytes
-    Info: Processing ended: Sun Aug 16 16:04:49 2026
-    Info: Elapsed time: 00:00:11
-    Info: Total CPU time (on all processors): 00:00:20
+    Info: Peak virtual memory: 4985 megabytes
+    Info: Processing ended: Mon Aug 17 23:38:52 2026
+    Info: Elapsed time: 00:00:20
+    Info: Total CPU time (on all processors): 00:00:28
 
 
 +------------------------------------------+

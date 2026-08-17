@@ -1,3 +1,6 @@
+// LLR memory bank used to store channel log-likelihood ratios for each variable node.
+// Moustafa Salman
+
 module llr_bank #(
 
     parameter WIDTH         = 8,
@@ -8,9 +11,7 @@ module llr_bank #(
 
     input logic clk,
 
-    // -------------------------------------------------
     // Write interface
-    // -------------------------------------------------
 
     input logic write_enable,
 
@@ -18,9 +19,7 @@ module llr_bank #(
 
     input logic signed [WIDTH-1:0] write_data,
 
-    // -------------------------------------------------
     // Read interface
-    // -------------------------------------------------
 
     input logic read_enable,
 
@@ -30,31 +29,20 @@ module llr_bank #(
 
 );
 
-    // -------------------------------------------------
-    // LLR memory
-    // -------------------------------------------------
+    // Stores one signed LLR value for each variable node.
 
     logic signed [WIDTH-1:0]
         llr_mem [0:NUM_VARIABLES-1];
 
-    // -------------------------------------------------
-    // Memory operations
-    // -------------------------------------------------
+    // Synchronous memory operations. Both reads and writes occur on
+    // the rising edge of the clock.
 
     always_ff @(posedge clk) begin
-
-        // ---------------------------------------------
-        // Write
-        // ---------------------------------------------
 
         if (write_enable)
 
             llr_mem[write_addr]
                 <= write_data;
-
-        // ---------------------------------------------
-        // Read
-        // ---------------------------------------------
 
         if (read_enable)
 

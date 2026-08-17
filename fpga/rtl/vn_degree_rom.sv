@@ -1,6 +1,7 @@
-// VN degree ROM — actual column weight of each variable node (3, 4, or 5)
-// Address : vn_index  (0..511)
-// Depth   : NUM_VN = 512
+ // VN degree ROM
+ // Stores the actual column weight for each variable node.
+ // Moustafa Salman
+
 module vn_degree_rom #(
     parameter int DEPTH      = 512,
     parameter int ADDR_WIDTH = 9,
@@ -15,6 +16,7 @@ module vn_degree_rom #(
 
     initial $readmemb("vn_degree_rom.mem", mem);
 
+    // Register the ROM output to provide a synchronous read interface.
     always_ff @(posedge clk)
         data <= mem[addr];
 

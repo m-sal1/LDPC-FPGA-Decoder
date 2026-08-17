@@ -1,5 +1,5 @@
 Timing Analyzer report for qc_ldpc_decoder_top
-Sun Aug 16 15:42:30 2026
+Mon Aug 17 23:33:42 2026
 Quartus Prime Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
 
 
@@ -101,26 +101,26 @@ https://fpgasoftware.intel.com/eula.
 ; Number detected on machine ; 22          ;
 ; Maximum allowed            ; 16          ;
 ;                            ;             ;
-; Average used               ; 6.93        ;
+; Average used               ; 5.00        ;
 ; Maximum used               ; 16          ;
 ;                            ;             ;
 ; Usage by Processor         ; % Time Used ;
 ;     Processor 1            ; 100.0%      ;
-;     Processor 2            ;  43.9%      ;
-;     Processor 3            ;  43.7%      ;
-;     Processor 4            ;  43.7%      ;
-;     Processor 5            ;  38.5%      ;
-;     Processor 6            ;  38.5%      ;
-;     Processor 7            ;  38.5%      ;
-;     Processor 8            ;  38.5%      ;
-;     Processor 9            ;  38.5%      ;
-;     Processor 10           ;  38.5%      ;
-;     Processor 11           ;  38.5%      ;
-;     Processor 12           ;  38.5%      ;
-;     Processor 13           ;  38.5%      ;
-;     Processor 14           ;  38.5%      ;
-;     Processor 15           ;  38.5%      ;
-;     Processor 16           ;  38.5%      ;
+;     Processor 2            ;  30.8%      ;
+;     Processor 3            ;  30.6%      ;
+;     Processor 4            ;  30.6%      ;
+;     Processor 5            ;  25.7%      ;
+;     Processor 6            ;  25.7%      ;
+;     Processor 7            ;  25.7%      ;
+;     Processor 8            ;  25.7%      ;
+;     Processor 9            ;  25.7%      ;
+;     Processor 10           ;  25.7%      ;
+;     Processor 11           ;  25.7%      ;
+;     Processor 12           ;  25.7%      ;
+;     Processor 13           ;  25.7%      ;
+;     Processor 14           ;  25.7%      ;
+;     Processor 15           ;  25.7%      ;
+;     Processor 16           ;  25.7%      ;
 +----------------------------+-------------+
 
 
@@ -129,7 +129,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------+--------+--------------------------+
 ; SDC File Path           ; Status ; Read at                  ;
 +-------------------------+--------+--------------------------+
-; qc_ldpc_decoder_top.sdc ; OK     ; Sun Aug 16 15:42:14 2026 ;
+; qc_ldpc_decoder_top.sdc ; OK     ; Mon Aug 17 23:33:11 2026 ;
 +-------------------------+--------+--------------------------+
 
 
@@ -594,7 +594,7 @@ No non-DPA dedicated SERDES Receiver circuitry present in device or used in desi
 Info: *******************************************************************
 Info: Running Quartus Prime Timing Analyzer
     Info: Version 22.1std.2 Build 922 07/20/2023 SC Lite Edition
-    Info: Processing started: Sun Aug 16 15:42:10 2026
+    Info: Processing started: Mon Aug 17 23:33:04 2026
 Info: Command: quartus_sta ldpc_qc_decoder -c qc_ldpc_decoder_top
 Info: qsta_default_script.tcl version: #1
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
@@ -704,8 +704,8 @@ Info (332102): Design is not fully constrained for setup requirements
 Info (332102): Design is not fully constrained for hold requirements
 Info: Quartus Prime Timing Analyzer was successful. 0 errors, 1 warning
     Info: Peak virtual memory: 5906 megabytes
-    Info: Processing ended: Sun Aug 16 15:42:30 2026
-    Info: Elapsed time: 00:00:20
-    Info: Total CPU time (on all processors): 00:01:49
+    Info: Processing ended: Mon Aug 17 23:33:42 2026
+    Info: Elapsed time: 00:00:38
+    Info: Total CPU time (on all processors): 00:02:08
 
 

@@ -1,14 +1,15 @@
 // de1_soc_ccsds_top.sv
-// DE1-SoC top-level wrapper for CCSDS serial LDPC decoder
+// Top-level DE1-SoC wrapper for the CCSDS serial LDPC decoder.
+// Moustafa Salman
 //
 // KEY[0] released = run, pressed = reset
 //
 // LEDR[0] = loading LLRs
-// LEDR[1] = decoder running (visible ~0.5ms at 50MHz)
-// LEDR[2] = done (latched)
-// LEDR[3] = converged / PASS (latched)
-// LEDR[4] = not converged / FAIL (latched)
-// LEDR[9] = datapath anchor
+// LEDR[1] = decoder running
+// LEDR[2] = decoding complete
+// LEDR[3] = converged / PASS
+// LEDR[4] = not converged / FAIL
+// LEDR[9] = datapath activity
 
 module de1_soc_ccsds_top (
     input  logic        CLOCK_50,
@@ -19,9 +20,7 @@ module de1_soc_ccsds_top (
     logic rst_n;
     assign rst_n = KEY[0];
 
-    // ----------------------------------------------------------------
-    // Decoder interface
-    // ----------------------------------------------------------------
+    // Decoder input and output signals.
     localparam int N = 512;
 
     logic signed [7:0]  llr_in;
@@ -34,9 +33,8 @@ module de1_soc_ccsds_top (
     logic [8:0]         decoded_bit_addr;
     logic               decoded_bit_valid;
 
-    // ----------------------------------------------------------------
-    // Startup FSM — identical to QC wrapper
-    // ----------------------------------------------------------------
+    // The wrapper first writes all LLR values, then issues a one-cycle
+    // start pulse and leaves the decoder running until completion.
     typedef enum logic [1:0] {
         S_LOAD  = 2'b00,
         S_START = 2'b01,
@@ -66,15 +64,13 @@ module de1_soc_ccsds_top (
         end
     end
 
-    // All-zero codeword with strong positive LLR
+    // Test input: an all-zero codeword represented by strong positive LLRs.
     assign llr_in           = 8'sd32;
     assign llr_write_addr   = load_addr;
     assign llr_write_enable = (top_state == S_LOAD);
     assign start            = (top_state == S_START);
 
-    // ----------------------------------------------------------------
-    // CCSDS serial LDPC decoder
-    // ----------------------------------------------------------------
+    // CCSDS serial LDPC decoder instance.
     ldpc_decoder_top #(
         .WIDTH      (8),
         .NUM_VN     (512),
@@ -97,9 +93,8 @@ module de1_soc_ccsds_top (
         .decoded_bit_valid(decoded_bit_valid)
     );
 
-    // ----------------------------------------------------------------
-    // Latch results — hold until reset
-    // ----------------------------------------------------------------
+    // Preserve completion and convergence status after the decoder
+    // finishes so the result remains visible on the LEDs.
     logic done_latched;
     logic conv_latched;
 
@@ -113,9 +108,8 @@ module de1_soc_ccsds_top (
         end
     end
 
-    // ----------------------------------------------------------------
-    // Datapath anchor — prevents optimiser removing decoder internals
-    // ----------------------------------------------------------------
+    // Keep a small amount of decoder output logic connected to the top
+    // level so synthesis does not remove otherwise unused datapath signals.
     (* keep *) logic [7:0] dec_shift;
     (* keep *) logic       dec_anchor;
 
@@ -129,9 +123,7 @@ module de1_soc_ccsds_top (
         end
     end
 
-    // ----------------------------------------------------------------
-    // LEDs
-    // ----------------------------------------------------------------
+    // Display the current decoder state and final result on the board LEDs.
     always_comb begin
         LEDR    = 10'b0;
         LEDR[0] = (top_state == S_LOAD);

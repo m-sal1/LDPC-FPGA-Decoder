@@ -1,18 +1,7 @@
-// =============================================================================
-// cnu.sv — Check Node Unit, 4-stage pipeline
-//
-// Splits min-search over 8 inputs into parallel half-searches then merge,
-// halving the combinational depth of the critical path to ~8ns per stage.
-//
-// Stage 1: abs values + overall sign        (comb → registered)
-// Stage 2: parallel min-search left [0..3]  (comb → registered)
-//          parallel min-search right [4..7] (comb → registered, same cycle)
-// Stage 3: merge left/right min results     (comb → registered)
-// Stage 4: output scaling + sign            (comb → registered)
-//
-// 4 clock cycles input-to-output latency.
-// Each combinational stage ~8ns → closes at 50MHz on Cyclone V.
-
+// cnu.sv
+// Pipelined check-node unit for the LDPC decoder.
+// Computes the two smallest input magnitudes and applies the required sign and scaling to each output.
+// Moustafa Salman
 
 module cnu #(
     parameter int DEGREE = 8,
@@ -27,11 +16,11 @@ module cnu #(
 );
 
     localparam IDX_WIDTH = $clog2(DEGREE);
-    localparam HALF      = DEGREE / 2;   // 4
+    localparam HALF      = DEGREE / 2;
 
-    // =========================================================================
-    // Stage 1: absolute values + overall sign
-    // =========================================================================
+    // Stage 1 stores the magnitude and sign of every input message,
+    // along with the XOR of all input signs.
+
     logic                     valid_s1;
     logic                     overall_sign_s1;
     logic [WIDTH-1:0]         abs_vals_s1  [0:DEGREE-1];
@@ -70,25 +59,21 @@ module cnu #(
         end
     end
 
-    // =========================================================================
-    // Stage 2: parallel half min-searches (left [0..3], right [4..7])
-    // Both run combinationally from stage 1 registers in the SAME cycle.
-    // =========================================================================
+    // Search the two halves independently. This reduces the number of
+    // values that need to be compared in the following merge stage.
+
     logic                     valid_s2;
     logic                     overall_sign_s2;
     logic                     sign_bits_s2  [0:DEGREE-1];
 
-    // Left half result
     logic [WIDTH-1:0]         lmin1_s2;
     logic [WIDTH-1:0]         lmin2_s2;
-    logic [IDX_WIDTH-1:0]     lmin1_idx_s2;   // global index (0..3)
+    logic [IDX_WIDTH-1:0]     lmin1_idx_s2;
 
-    // Right half result
     logic [WIDTH-1:0]         rmin1_s2;
     logic [WIDTH-1:0]         rmin2_s2;
-    logic [IDX_WIDTH-1:0]     rmin1_idx_s2;   // global index (4..7)
+    logic [IDX_WIDTH-1:0]     rmin1_idx_s2;
 
-    // Combinational left half
     logic [WIDTH-1:0]         c2_lmin1, c2_lmin2;
     logic [IDX_WIDTH-1:0]     c2_lmin1_idx;
 
@@ -107,14 +92,13 @@ module cnu #(
         end
     end
 
-    // Combinational right half
     logic [WIDTH-1:0]         c2_rmin1, c2_rmin2;
     logic [IDX_WIDTH-1:0]     c2_rmin1_idx;
 
     always_comb begin
         c2_rmin1     = {WIDTH{1'b1}};
         c2_rmin2     = {WIDTH{1'b1}};
-        c2_rmin1_idx = IDX_WIDTH'(HALF);   // start index at 4
+        c2_rmin1_idx = IDX_WIDTH'(HALF);
         for (int i = HALF; i < DEGREE; i++) begin
             if (abs_vals_s1[i] < c2_rmin1) begin
                 c2_rmin2     = c2_rmin1;
@@ -154,11 +138,9 @@ module cnu #(
         end
     end
 
-    // =========================================================================
-    // Stage 3: merge left/right results -> overall min1/min2
-    // Only 4 candidates: lmin1, lmin2, rmin1, rmin2
-    // Much cheaper than 8-input search.
-    // =========================================================================
+    // Merge the two half-search results. Only four candidates are needed
+    // to determine the global minimum and second minimum.
+
     logic                     valid_s3;
     logic                     overall_sign_s3;
     logic                     sign_bits_s3 [0:DEGREE-1];
@@ -170,22 +152,17 @@ module cnu #(
     logic [IDX_WIDTH-1:0]     c3_min1_idx;
 
     always_comb begin
-        // Compare the two halves' minimums
         if (lmin1_s2 <= rmin1_s2) begin
-            // Left has smaller min1
             c3_min1     = lmin1_s2;
             c3_min1_idx = lmin1_idx_s2;
-            // min2 is smallest of lmin2, rmin1
             if (lmin2_s2 <= rmin1_s2) begin
                 c3_min2 = lmin2_s2;
             end else begin
                 c3_min2 = rmin1_s2;
             end
         end else begin
-            // Right has smaller min1
             c3_min1     = rmin1_s2;
             c3_min1_idx = rmin1_idx_s2;
-            // min2 is smallest of rmin2, lmin1
             if (rmin2_s2 <= lmin1_s2) begin
                 c3_min2 = rmin2_s2;
             end else begin
@@ -216,9 +193,9 @@ module cnu #(
         end
     end
 
-    // =========================================================================
-    // Stage 4: output scaling + sign assignment
-    // =========================================================================
+    // Apply the normalized min-sum scaling and restore the appropriate
+    // sign for each outgoing CN-to-VN message.
+
     logic signed [WIDTH-1:0]  c4_msg_out [0:DEGREE-1];
 
     always_comb begin

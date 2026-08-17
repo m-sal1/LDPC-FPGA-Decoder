@@ -1,3 +1,7 @@
+// Stores one message value for each edge in the Tanner graph.
+// Provides synchronous read and write access and maps the memory to M20K blocks.
+// Moustafa Salman
+
 module edge_message_bank #(
 
     parameter WIDTH      = 8,
@@ -9,8 +13,8 @@ module edge_message_bank #(
     input logic clk,
 
     // Read interface
-    input  logic read_enable,
-    input  logic [ADDR_WIDTH-1:0] read_addr,
+    input logic read_enable,
+    input logic [ADDR_WIDTH-1:0] read_addr,
     output logic signed [WIDTH-1:0] read_data,
 
     // Write interface
@@ -20,24 +24,20 @@ module edge_message_bank #(
 
 );
 
-    // -------------------------------------------------
-    // EDGE MESSAGE STORAGE
-    // -------------------------------------------------
+    // Stores the message associated with each edge.
 
     (* ramstyle = "M20K" *)
     logic signed [WIDTH-1:0] edge_memory [0:NUM_EDGES-1];
 
-    // -------------------------------------------------
-    // SYNCHRONOUS MEMORY ACCESS
-    // -------------------------------------------------
+    // Both memory operations are synchronous to the rising clock edge.
 
     always_ff @(posedge clk) begin
 
-        // Write updated edge message
+        // Write an updated edge message.
         if (write_enable)
             edge_memory[write_addr] <= write_data;
 
-        // Read current edge message
+        // Register the message read from the selected edge.
         if (read_enable)
             read_data <= edge_memory[read_addr];
 

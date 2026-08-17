@@ -1,3 +1,6 @@
+// Syndrome checker for verifying the decoded codeword against all parity-check equations.
+// Moustafa Salman
+
 module syndrome_checker #(
 
     parameter NUM_CHECK_NODES = 256,
@@ -16,12 +19,13 @@ module syndrome_checker #(
 
 );
 
-    // Check-node connectivity ROM
+    // Each ROM entry contains the variable-node indices connected to one
+    // check node. The indices are packed into fixed-width slots.
 
     logic [VN_WIDTH*MAX_ROW_WEIGHT-1:0]
         check_node_map [0:NUM_CHECK_NODES-1];
 
-    // Internal signals
+    // Loop variables and intermediate parity state.
 
     integer cn;
     integer vn_idx;
@@ -31,7 +35,7 @@ module syndrome_checker #(
 
     logic all_checks_passed;
 
-    // ROM Initialization
+    // Load the parity-check connectivity from the generated memory file.
 
     initial begin
 
@@ -42,19 +46,19 @@ module syndrome_checker #(
 
     end
 
-    // Syndrome Evaluation
+    // Evaluate the syndrome combinationally by XORing the decoded bits
+    // connected to each check node. A valid codeword has zero parity for
+    // every check equation.
 
     always_comb begin
 
         all_checks_passed = 1'b1;
 
-        // Evaluate every parity-check equation
-
         for (cn = 0; cn < NUM_CHECK_NODES; cn++) begin
 
             parity = 1'b0;
 
-            // XOR all connected VN bits
+            // XOR all variable nodes connected to this check node.
 
             for (bit_idx = 0;
                  bit_idx < MAX_ROW_WEIGHT;
@@ -70,7 +74,7 @@ module syndrome_checker #(
 
             end
 
-            // Parity-check failed
+            // Any non-zero parity means this check equation failed.
 
             if (parity != 1'b0)
                 all_checks_passed = 1'b0;

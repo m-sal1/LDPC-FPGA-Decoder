@@ -1,7 +1,6 @@
 // qc_col_weight_rom.sv
-// Depth: NB=64, Width: 2 bits
-// Data: actual col weight for each block-col (2 or 3)
-// Author: Mostafa Salman
+// Stores the column weight for each QC-LDPC block column.
+// Moustafa Salman
 
 module qc_col_weight_rom #(
     parameter int DEPTH = 64,
@@ -12,6 +11,10 @@ module qc_col_weight_rom #(
     output logic [WIDTH-1:0] data
 );
     logic [WIDTH-1:0] mem [0:DEPTH-1];
+
     initial $readmemb("qc_col_weight.mem", mem);
+
+    // Register the ROM output for synchronous access.
     always_ff @(posedge clk) data <= mem[addr];
+
 endmodule

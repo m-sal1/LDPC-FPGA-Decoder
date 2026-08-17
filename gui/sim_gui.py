@@ -1,8 +1,6 @@
-"""
-sim_gui.py — Reconciler: LDPC Simulation Workspace
-Place in: LDPC-FPGA-Decoder/gui/sim_gui.py
-Run: python gui/sim_gui.py
-"""
+# sim_gui.py
+# GUI for configuring and running LDPC BER/FER and QKD simulations.
+# Moustafa Salman
 
 import sys, math, threading
 from pathlib import Path
@@ -26,6 +24,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget,
 )
 
+
 MATRICES = {
     "CCSDS n512  ·  irregular / serial":
         "matrices/CCSDS_ldpc_n512_k256.alist",
@@ -33,7 +32,7 @@ MATRICES = {
         "matrices/QC_LDPC_n512_k256_z8_irreg.alist",
 }
 
-# ── Stylesheet ────────────────────────────────────────────────────────────────
+
 QSS = """
 * { font-family: "Segoe UI"; font-size: 10pt; }
 
@@ -168,7 +167,6 @@ QLabel { background: transparent; }
 """
 
 
-# ── Worker ────────────────────────────────────────────────────────────────────
 class Worker(QObject):
     log        = Signal(str, str)
     progress   = Signal(float, str)
@@ -306,7 +304,6 @@ class Worker(QObject):
         self.log.emit("  Complete.", "good")
 
 
-# ── Main window ───────────────────────────────────────────────────────────────
 class Reconciler(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -327,7 +324,6 @@ class Reconciler(QMainWindow):
         main.setContentsMargins(16, 14, 16, 12)
         main.setSpacing(10)
 
-        # ── Top bar ───────────────────────────────────────────────────────────
         top = QHBoxLayout()
 
         title = QLabel("Reconciler")
@@ -352,11 +348,9 @@ class Reconciler(QMainWindow):
 
         main.addLayout(top)
 
-        # ── Config bar ────────────────────────────────────────────────────────
         cfg = self._panel()
         ch  = QHBoxLayout(cfg); ch.setContentsMargins(12, 10, 12, 10); ch.setSpacing(14)
 
-        # Mode
         ml = QLabel("Mode"); ml.setStyleSheet("color:#8b949e; font-size:8pt;")
         ch.addWidget(ml)
         mr = QHBoxLayout(); mr.setSpacing(4)
@@ -373,7 +367,6 @@ class Reconciler(QMainWindow):
         div.setStyleSheet("color:#30363d;"); div.setFixedWidth(1)
         ch.addWidget(div)
 
-        # Matrix
         xl = QLabel("Matrix"); xl.setStyleSheet("color:#8b949e; font-size:8pt;")
         ch.addWidget(xl)
         self.matrix_cb = QComboBox()
@@ -395,7 +388,6 @@ class Reconciler(QMainWindow):
 
         main.addWidget(cfg)
 
-        # ── Parameters ────────────────────────────────────────────────────────
         par = self._panel()
         pv  = QVBoxLayout(par); pv.setContentsMargins(12, 10, 12, 10); pv.setSpacing(6)
         self.param_stack = QStackedWidget()
@@ -404,7 +396,6 @@ class Reconciler(QMainWindow):
         pv.addWidget(self.param_stack)
         main.addWidget(par)
 
-        # ── Results ───────────────────────────────────────────────────────────
         res = self._panel()
         rv  = QVBoxLayout(res); rv.setContentsMargins(0, 0, 0, 0); rv.setSpacing(0)
 
@@ -428,7 +419,6 @@ class Reconciler(QMainWindow):
 
         main.addWidget(res, 1)
 
-        # ── Footer ────────────────────────────────────────────────────────────
         foot = QHBoxLayout(); foot.setSpacing(10)
         self.detail = QLabel("")
         self.detail.setStyleSheet("color:#8b949e; font-size:8pt;")
@@ -489,7 +479,6 @@ class Reconciler(QMainWindow):
         lay.addWidget(QWidget(), 0, len(fields), 1, 1)
         return f
 
-    # ── Mode ──────────────────────────────────────────────────────────────────
     def _set_mode(self, mode):
         ber = mode == "BER/FER"
         self.ber_btn.setChecked(ber); self.qkd_btn.setChecked(not ber)
@@ -513,7 +502,6 @@ class Reconciler(QMainWindow):
         self.matrix_cb.addItem(k)
         self.matrix_cb.setCurrentText(k)
 
-    # ── Run / Stop ────────────────────────────────────────────────────────────
     def _run(self):
         if self.running: return
         key  = self.matrix_cb.currentText()
@@ -563,7 +551,6 @@ class Reconciler(QMainWindow):
         if p:
             Path(p).write_text(self.output.toPlainText(), encoding="utf-8")
 
-    # ── Slots ─────────────────────────────────────────────────────────────────
     @Slot(str, str)
     def _on_log(self, text, tag):
         c = {"good":"#3fb950","warn":"#d29922","bad":"#f85149","sub":"#8b949e"}.get(tag,"#8b949e")

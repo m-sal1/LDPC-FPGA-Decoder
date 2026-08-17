@@ -1,3 +1,7 @@
+// Variable-node update unit for combining the channel LLR with incoming
+// check-node messages and producing extrinsic messages.
+// Moustafa Salman
+
 module vnu #(
     parameter int DEGREE = 5,
     parameter int WIDTH  = 8
@@ -16,7 +20,7 @@ module vnu #(
     logic signed [WIDTH-1:0] saturated_value;
     logic signed [WIDTH-1:0] decision_sat;
 
-    // ── Saturation helper ─────────────────────────────────────────────────────
+    // Limits a wider intermediate value to the configured LLR range.
     function automatic signed [WIDTH-1:0] saturate;
         input signed [WIDTH+4:0] value;
         localparam signed [WIDTH+4:0] MAX_VAL =  (2**(WIDTH-1)) - 1;
@@ -28,26 +32,29 @@ module vnu #(
         end
     endfunction
 
-    // ── Combinational datapath ────────────────────────────────────────────────
+    // The VNU is purely combinational, so all intermediate and output
+    // values are assigned for every possible input combination.
     always_comb begin
 
-        // Initialise temporaries — prevents latch inference
+        // Initialise temporaries to avoid inferred latches.
         total           = '0;
         extrinsic       = '0;
         saturated_value = '0;
 
-        // Accumulate: channel LLR + all incoming CN->VN messages.
-        // Unused slots (index >= degree) are driven to 0 by the FSM,
-        // so summing all DEGREE slots is always safe.
+        // Combine the channel LLR with all incoming CN-to-VN messages.
+        // Unused message slots are driven to zero by the surrounding logic,
+        // so including all DEGREE entries does not affect the result.
         total = {{(5){llr_in[WIDTH-1]}}, llr_in};
         for (int i = 0; i < DEGREE; i++)
             total = total + {{(5){msg_in[i][WIDTH-1]}}, msg_in[i]};
 
-        // Decision LLR
+        // Saturated a-posteriori LLR used for the hard decision.
         decision_sat = saturate(total);
         decision_llr = decision_sat;
 
-        // Extrinsic messages for valid slots; zero for unused slots
+        // Remove each incoming message in turn to form the corresponding
+        // extrinsic VN-to-CN message. Entries beyond the active degree
+        // are cleared.
         for (int i = 0; i < DEGREE; i++) begin
             if (i < int'(degree)) begin
                 extrinsic       = total - {{(5){msg_in[i][WIDTH-1]}}, msg_in[i]};

@@ -1,10 +1,6 @@
-// =============================================================================
-// ldpc_decoder_top.sv — Working baseline LDPC decoder (CCSDS n512_k256)
-// CN-serial flooding schedule, edge-indexed message banks.
-// Verified: TESTS=2 PASS=2, Python<->RTL equivalence confirmed.
-// Throughput: 0.53 Mbps at 50MHz (timing closes comfortably).
-// Author: Mostafa Salman
-// =============================================================================
+// Top-level CCSDS LDPC decoder integrating the message memories, lookup ROMs,
+// node update units, iteration controller, syndrome checker, and decoded-bit readout.
+// Moustafa Salman
 
 module ldpc_decoder_top #(
     parameter int WIDTH      = 8,
@@ -76,12 +72,14 @@ module ldpc_decoder_top #(
     logic                         dec_wr_data, dec_wr_en;
     logic [NUM_VN-1:0]            dec_bits_reg;
 
+    // Store the hard decision bits produced by the iteration controller.
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) dec_bits_reg <= '0;
         else if (dec_wr_en) dec_bits_reg[dec_wr_addr] <= dec_wr_data;
     end
 
-    // Serial readout
+    // After decoding, serialise the stored decision bits for the top-level
+    // interface. Each valid cycle presents one bit and its variable-node address.
     logic [$clog2(NUM_VN)-1:0] readout_addr;
     logic                      readout_active;
 
@@ -106,6 +104,8 @@ module ldpc_decoder_top #(
         end
     end
 
+    // The syndrome checker is combinational, so syn_done provides a registered
+    // timing point for the controller after a syndrome check is requested.
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) syn_done <= 1'b0;
         else        syn_done <= syn_start;
@@ -168,6 +168,8 @@ module ldpc_decoder_top #(
         .clk(clk), .decoded_bits(dec_bits_reg), .syndrome_valid(syn_pass)
     );
 
+    // The controller coordinates memory accesses, CNU/VNU updates, iterations,
+    // syndrome checks, and the final hard decisions.
     iteration_controller #(
         .NUM_VN(NUM_VN), .NUM_CN(NUM_CN), .NUM_EDGES(NUM_EDGES),
         .ROW_WEIGHT(ROW_WEIGHT), .MAX_VN_DEG(MAX_VN_DEG),

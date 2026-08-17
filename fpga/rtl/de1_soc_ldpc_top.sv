@@ -1,12 +1,7 @@
-// de1_soc_ldpc_top.sv — final version
-// KEY[0] released = run, pressed = reset
-//
-// LEDR[0] = loading LLRs
-// LEDR[1] = decoder running (not yet done)
-// LEDR[2] = done (latched)
-// LEDR[3] = converged / PASS (latched)
-// LEDR[4] = not converged / FAIL (latched)
-// LEDR[9] = dec_anchor (datapath keepalive)
+// de1_soc_ldpc_top.sv
+// Top-level DE1-SoC wrapper for the QC-LDPC decoder.
+// Handles startup, LLR loading, decoder control, result latching, and LED status.
+// Moustafa Salman
 
 module de1_soc_ldpc_top (
     input  logic        CLOCK_50,
@@ -17,9 +12,7 @@ module de1_soc_ldpc_top (
     logic rst_n;
     assign rst_n = KEY[0];
 
-    // ----------------------------------------------------------------
     // Decoder interface
-    // ----------------------------------------------------------------
     logic signed [7:0]  llr_in;
     logic [8:0]         llr_write_addr;
     logic               llr_write_enable;
@@ -30,9 +23,8 @@ module de1_soc_ldpc_top (
     logic [8:0]         decoded_bit_addr;
     logic               decoded_bit_valid;
 
-    // ----------------------------------------------------------------
-    // Startup FSM
-    // ----------------------------------------------------------------
+    // The startup FSM writes the test LLRs before issuing a one-cycle
+    // start pulse to the decoder.
     typedef enum logic [1:0] {
         S_LOAD  = 2'b00,
         S_START = 2'b01,
@@ -62,14 +54,13 @@ module de1_soc_ldpc_top (
         end
     end
 
+    // Use a strong positive LLR for the all-zero test codeword.
     assign llr_in           = 8'sd32;
     assign llr_write_addr   = load_addr;
     assign llr_write_enable = (top_state == S_LOAD);
     assign start            = (top_state == S_START);
 
-    // ----------------------------------------------------------------
-    // Decoder
-    // ----------------------------------------------------------------
+    // QC-LDPC decoder instance.
     qc_ldpc_decoder_top #(
         .MSG_WIDTH (8),
         .Z         (8),
@@ -94,9 +85,7 @@ module de1_soc_ldpc_top (
         .decoded_bit_valid(decoded_bit_valid)
     );
 
-    // ----------------------------------------------------------------
-    // Latch done and converged — hold result until next reset
-    // ----------------------------------------------------------------
+    // Preserve the final decoder status so it remains visible after completion.
     logic done_latched;
     logic conv_latched;
 
@@ -110,9 +99,8 @@ module de1_soc_ldpc_top (
         end
     end
 
-    // ----------------------------------------------------------------
-    // Datapath anchor
-    // ----------------------------------------------------------------
+    // Keep decoded data connected to the top level so synthesis does not
+    // remove the decoder output datapath as unused logic.
     (* keep *) logic [7:0] dec_shift;
     (* keep *) logic       dec_anchor;
 
@@ -126,9 +114,7 @@ module de1_soc_ldpc_top (
         end
     end
 
-    // ----------------------------------------------------------------
-    // LEDs
-    // ----------------------------------------------------------------
+    // Display the current decoder state and final result on the board LEDs.
     always_comb begin
         LEDR    = 10'b0;
         LEDR[0] = (top_state == S_LOAD);

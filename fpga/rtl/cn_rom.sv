@@ -1,7 +1,9 @@
 // CN adjacency ROM
-// Word format: {edge_id[10:0], vn_index[8:0]} packed into 20 bits
-// Address    : cn_index * ROW_WEIGHT + slot
-// Depth      : NUM_EDGES = 2048  (256 CNs x 8 slots)
+// Stores the edge ID and variable-node index for each check-node connection.
+// Moustafa Salman
+//
+// Each address corresponds to cn_index * ROW_WEIGHT + slot.
+
 module cn_rom #(
     parameter int DEPTH      = 2048,
     parameter int ADDR_WIDTH = 11,
@@ -16,6 +18,7 @@ module cn_rom #(
 
     initial $readmemb("cn_rom.mem", mem);
 
+    // Register the ROM output to provide a synchronous read interface.
     always_ff @(posedge clk)
         data <= mem[addr];
 

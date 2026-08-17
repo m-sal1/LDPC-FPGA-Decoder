@@ -1,11 +1,6 @@
-// qc_ldpc_decoder_top.sv — QC-LDPC parallel decoder top level
-//
-// (2/3, 5/6)-irregular QC-LDPC, n=512, m=256, Z=8 parallelism factor.
-// 8 parallel CNU instances (degree 6, 4-stage pipeline)
-// 8 parallel VNU instances (degree 2/3, combinational)
-// Circulant-ID indexed memory banks (depth = MB*MAX_ROW_W = 192, padded)
-//
-// Author: Mostafa Salman
+// qc_ldpc_decoder_top.sv
+// Top-level QC-LDPC decoder integrating the memory banks, lookup ROMs, parallel CNU/VNU units, and iteration controller.
+// Moustafa Salman
 
 module qc_ldpc_decoder_top #(
     parameter int MSG_WIDTH  = 8,
@@ -34,9 +29,7 @@ module qc_ldpc_decoder_top #(
     output logic                        decoded_bit_valid
 );
 
-    // =========================================================================
-    // LLR bank
-    // =========================================================================
+    // LLR memory is organised by base-column, with Z values read in parallel.
     logic [$clog2(NB)-1:0]       llr_rd_bcol;
     logic signed [MSG_WIDTH-1:0] llr_rd_data [0:Z-1];
 
@@ -46,11 +39,9 @@ module qc_ldpc_decoder_top #(
         .rd_bcol(llr_rd_bcol),    .rd_data(llr_rd_data)
     );
 
-    // =========================================================================
-    // Message banks — depth = MB*MAX_ROW_W = 192 (padded)
-    // Address width = 8 bits to cover 0..191
-    // =========================================================================
-    localparam int CIRC_DEPTH = MB * MAX_ROW_W;  // 192
+    // Message banks store one Z-wide group for each circulant position.
+    // The depth is padded to accommodate the maximum row weight.
+    localparam int CIRC_DEPTH = MB * MAX_ROW_W;
 
     logic [7:0]                  vc_rd_addr, vc_wr_addr;
     logic                        vc_rd_en,   vc_wr_en;
@@ -74,9 +65,7 @@ module qc_ldpc_decoder_top #(
         .wr_addr(cv_wr_addr), .wr_en(cv_wr_en), .wr_data(cv_wr_data)
     );
 
-    // =========================================================================
-    // ROMs
-    // =========================================================================
+    // ROMs provide the QC connectivity and the variable-node slot mapping.
     logic [7:0] cn_rom_addr;
     logic [8:0] cn_rom_data;
     logic [7:0] vn_rom_addr;
@@ -91,9 +80,8 @@ module qc_ldpc_decoder_top #(
     qc_vn_cn_slot_rom vn_cn_slot_rom_inst (
         .clk(clk), .addr(vn_cn_slot_addr), .data(vn_cn_slot_data));
 
-    // =========================================================================
-    // Barrel shifter
-    // =========================================================================
+    // Rotates the Z values according to the circulant shift required by
+    // the current QC-LDPC connection.
     logic signed [MSG_WIDTH-1:0] shift_in  [0:Z-1];
     logic [$clog2(Z)-1:0]        shift_amt;
     logic signed [MSG_WIDTH-1:0] shift_out [0:Z-1];
@@ -101,9 +89,8 @@ module qc_ldpc_decoder_top #(
     barrel_shifter #(.Z(Z),.MSG_WIDTH(MSG_WIDTH)) shifter_inst (
         .data_in(shift_in), .shift(shift_amt), .data_out(shift_out));
 
-    // =========================================================================
-    // Z=8 parallel CNU instances (4-stage pipeline, DEGREE=MAX_ROW_W=6)
-    // =========================================================================
+    // Eight CNU instances process the Z rows in parallel. Each CNU uses
+    // a four-stage pipeline to reduce the combinational critical path.
     logic                        cnu_valid_in, cnu_valid_out;
     logic signed [MSG_WIDTH-1:0] cnu_msg_in  [0:Z-1][0:MAX_ROW_W-1];
     logic signed [MSG_WIDTH-1:0] cnu_msg_out [0:Z-1][0:MAX_ROW_W-1];
@@ -126,9 +113,7 @@ module qc_ldpc_decoder_top #(
         end
     endgenerate
 
-    // =========================================================================
-    // Z=8 parallel VNU instances (combinational, DEGREE=MAX_COL_W=3)
-    // =========================================================================
+    // Eight VNU instances process the Z variable nodes in parallel.
     logic signed [MSG_WIDTH-1:0] vnu_msg_in    [0:Z-1][0:MAX_COL_W-1];
     logic signed [MSG_WIDTH-1:0] vnu_llr_in    [0:Z-1];
     logic [2:0]                  vnu_degree;
@@ -154,9 +139,7 @@ module qc_ldpc_decoder_top #(
         end
     endgenerate
 
-    // =========================================================================
-    // Decision bit register
-    // =========================================================================
+    // Stores the hard decisions produced for each group of Z variable nodes.
     logic [$clog2(NB)-1:0] dec_wr_bcol;
     logic [Z-1:0]           dec_wr_data;
     logic                   dec_wr_en;
@@ -170,9 +153,7 @@ module qc_ldpc_decoder_top #(
         end
     end
 
-    // =========================================================================
-    // Syndrome checker
-    // =========================================================================
+    // Checks the stored hard decisions against the parity-check equations.
     logic syn_pass, syn_start, syn_done;
 
     syndrome_checker syndrome_inst (
@@ -181,14 +162,14 @@ module qc_ldpc_decoder_top #(
         .syndrome_valid(syn_pass)
     );
 
+    // Register the syndrome request so the controller can wait for a
+    // defined clock boundary before evaluating the result.
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) syn_done <= 1'b0;
         else        syn_done <= syn_start;
     end
 
-    // =========================================================================
-    // Serial readout
-    // =========================================================================
+    // Serialise the completed decoded codeword through the top-level output.
     logic [$clog2(NUM_VN)-1:0] readout_addr;
     logic                       readout_active;
 
@@ -217,9 +198,7 @@ module qc_ldpc_decoder_top #(
         end
     end
 
-    // =========================================================================
-    // Weight ROMs
-    // =========================================================================
+    // ROMs containing the row and column weights used by the controller.
     logic [4:0] row_w_addr;
     logic [2:0] row_w_data;
     logic [5:0] col_w_addr;
@@ -230,9 +209,8 @@ module qc_ldpc_decoder_top #(
     qc_col_weight_rom col_w_rom_inst (
         .clk(clk), .addr(col_w_addr), .data(col_w_data));
 
-    // =========================================================================
-    // Iteration controller
-    // =========================================================================
+    // Coordinates the QC-LDPC message-passing schedule, memory accesses,
+    // node updates, syndrome checks, and iteration control.
     qc_iteration_controller #(
         .Z         (Z),
         .MB        (MB),

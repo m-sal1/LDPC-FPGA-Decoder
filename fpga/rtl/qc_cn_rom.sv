@@ -1,7 +1,6 @@
 // qc_cn_rom.sv
-// Address: brow * ROW_WEIGHT + slot  (0..MB*ROW_WEIGHT-1 = 0..95)
-// Data:    {col_block[4:0], shift[3:0]}  9 bits
-// Author: Mostafa Salman
+// Stores the QC-LDPC check-node connectivity and circulant shift values.
+// Moustafa Salman
 
 module qc_cn_rom #(
     parameter int DEPTH = 192,
@@ -13,6 +12,10 @@ module qc_cn_rom #(
 );
     (* ramstyle = "M10K" *)
     logic [WIDTH-1:0] mem [0:DEPTH-1];
+
     initial $readmemb("qc_cn_rom.mem", mem);
+
+    // Register the ROM output for synchronous access.
     always_ff @(posedge clk) data <= mem[addr];
+
 endmodule
