@@ -20,7 +20,7 @@ pip install numpy PySide6 matplotlib
 python gui/sim_gui.py
 ```
 
-Or use `dist/Reconciler.exe` — no Python required.
+Or use `Reconciler/Reconciler.exe` — no Python required.
 
 ---
 
