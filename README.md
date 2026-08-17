@@ -99,7 +99,7 @@ gui/
   plot_qkd_results.py  QKD key rate plots
 matrices/           LDPC alist files (CCSDS + QC-LDPC irregular)
 results/            Simulation outputs and figures
-dist/
+Reconciler/
   Reconciler.exe    Standalone simulation GUI
 ```
 
