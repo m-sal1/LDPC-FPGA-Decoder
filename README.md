@@ -20,7 +20,7 @@ pip install numpy PySide6 matplotlib
 python gui/sim_gui.py
 ```
 
-Or use `dist/Reconciler.exe` — no Python required.
+Or use `Reconciler/Reconciler.exe` — no Python required.
 
 ---
 
@@ -99,7 +99,7 @@ gui/
   plot_qkd_results.py  QKD key rate plots
 matrices/           LDPC alist files (CCSDS + QC-LDPC irregular)
 results/            Simulation outputs and figures
-dist/
+Reconciler/
   Reconciler.exe    Standalone simulation GUI
 ```
 
